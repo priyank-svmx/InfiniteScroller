@@ -6,6 +6,14 @@ import { useDrag } from "react-dnd";
 import { DataContext } from "../CONTEXT/available_contexts";
 import { events } from "../CONTEXT/EventEnumeration";
 
+/**
+ * ____BUG____
+ * Saving scroll-position for various tabs -
+ * - if scrolling in one tab should not effect scroll position of the other tabs
+ * - Scroll should be smooth when moving down on the list
+ *
+ */
+
 function Row(props) {
   const {
     rowIndex,
@@ -92,35 +100,10 @@ function Row(props) {
  *   RawData => GroupedData => ApplyFilters => Views => RowWrapper => scrollLogic => RunwayIntegration
  *  */
 
-// function RowGroup({ groupIndex, groupMembers, emitToggle, isVisible }) {
-//   let styleObj = {
-//     transform: `translateY(${groupIndex * 50}px)`
-//   };
-//   console.log(`is visible ${isVisible} groupIndex ${groupIndex}`);
-//   return (
-//     <div
-//       className="runway-row-group"
-//       style={styleObj}
-//       onClick={evt => {
-//         emitToggle({
-//           groupIndex,
-//           numberOfRowsAffected: groupMembers.length // could be redundant
-//         });
-//       }}
-//     >
-//       <div>Group Title</div>
-
-//       {isVisible &&
-//         groupMembers.map((item, index) => {
-//           return Row({ rowtext: item, restOfTheInformation: index });
-//         })}
-//     </div>
-//   );
-// }
 /**
- * FIXME: throttled scroll event
+ * FIXME: DONE: throttled scroll event
  *
- * TODO: Row wrapper and limited dom nodes window size - while scrolling up or down
+ * TODO: DONE: Row wrapper and limited dom nodes window size - while scrolling up or down
  *
  * TODO: Data hose - Viewport size of records to siphon through at Scroll
  *
@@ -134,30 +117,22 @@ export default class Runway2 extends Component {
     scrollLocation: {
       scrollTop: 0,
       clientHeight: 600
-    },
+    }
     /**
-     * Improvement:
+     * Improvement: DONE:
      * move the group state info to
      * the parent above ..
      * let the parent decide which groups to show
      * and the items in the group
      *
-     *TODO:
+     *TODO: <DISCARDED!!>
      *How to decide the group-height? at the parent level or within the runway
-     *
-     *
-     */
-    accordion_metaData: {
-      total: 2,
-      accordions: {
-        "group-id": "no. of items/questions",
-        "09IJSKDL-id": 30
-      }
-    },
-    toggled: {
-      latest_toggled: "<group-id>",
-      "<group-id>": "true-false  if `falsy` then accordion is toggled-in"
-    }
+     **/
+
+    // toggled: {
+    //   latest_toggled: "<group-id>",
+    //   "<group-id>": "true-false  if `falsy` then accordion is toggled-in"
+    // }
   };
 
   constructor(props) {
@@ -175,36 +150,10 @@ export default class Runway2 extends Component {
    * RowWrapper - responsible for spatial placement of the wrapped row
    */
   RowWrapper({ rowIndex, rowText, key, subGroupHead = false }) {
-    /** Improvement:
-     * create a single style object with a number of transform entries.
-     * that number would be equal to the number of rows in the runway.
-     *
-     * this way we dont have to create style-object every time and only update the
-     * tarnsform value for the corresponding row-index
-     */
     let styleObj = {
       transform: `translateY(${rowIndex * this.state.rowHeight}px)`
     };
-    // return (
-    //   <div
-    //     className={`runway-row ${subGroupHead ? "grp-head" : ""}`}
-    //     key={key}
-    //     style={styleObj}
-    //     onClick={
-    //       subGroupHead
-    //         ? () => {
-    //             console.log("head clicked");
-    //             this.props.triggerEvent({
-    //               eventName: events.hide,
-    //               payload: rowText
-    //             });
-    //           }
-    //         : null
-    //     }
-    //   >
-    //     {`${rowText} ${rowIndex}`}
-    //   </div>
-    // );
+
     return (
       <Row
         rowIndex={rowIndex}
@@ -239,25 +188,25 @@ export default class Runway2 extends Component {
     /** TODO: Array slice can be used to get the required data set and then map over it */
     for (let i = frameRange[0], j = 0; i <= frameRange[1]; i++, j++) {
       /**
-       * if frame-range is greater than Data-set length then break loop;
+       * if frame-range is greater than Data-set length, then break the loop;
        */
       if (i > DATA.length - 1) {
         break;
       }
 
       dataItem = DATA[i];
-      if (dataItem.groupIdentifier && dataItem.end) {
+      if (dataItem.subGroupIdentifier && dataItem.end) {
         /** Don't create react-element for group-end-tag */
         continue;
       }
       frame.push(
         this.RowWrapper({
           rowIndex: i,
-          rowText: dataItem.groupIdentifier
-            ? dataItem.groupIdentifier
+          rowText: dataItem.subGroupIdentifier
+            ? dataItem.subGroupIdentifier
             : dataItem.question,
           key: j,
-          subGroupHead: dataItem.groupIdentifier ? true : false
+          subGroupHead: dataItem.subGroupIdentifier ? true : false
         })
       );
     }
@@ -302,16 +251,6 @@ export default class Runway2 extends Component {
     }
   }
 
-  emitToggle(obj) {
-    this.setState({
-      toggled: {
-        ...this.state.toggled,
-        latest_toggled: obj.groupIndex,
-        [obj.groupIndex]: !this.state.toggled[obj.groupIndex]
-      }
-    });
-  }
-
   render() {
     console.log("How state tree looks like after every render");
     console.log(this.state);
@@ -329,28 +268,6 @@ export default class Runway2 extends Component {
               }}
             ></div>
             {this.RowFrame()}
-            {/* <RowGroup
-              isVisible={!this.state.toggled["1"]}
-              groupIndex={1}
-              groupMembers={["gamma", "omehga", "delta"]}
-              emitToggle={obj => {
-                this.emitToggle(obj);
-              }}
-            />
-            <RowGroup
-              groupIndex={2}
-              isVisible={!this.state.toggled["2"]}
-              groupMembers={[
-                "gamma-2",
-                "omehga-3",
-                "delta-5",
-                "omegha-31",
-                "delta-52"
-              ]}
-              emitToggle={obj => {
-                this.emitToggle(obj);
-              }}
-            /> */}
           </div>
         </div>
       </React.Fragment>

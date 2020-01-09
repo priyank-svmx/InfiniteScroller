@@ -12,7 +12,7 @@
   
 ];*/
 
-/**  Represent data as flat array
+/**  Represent data as a flat array, with start and stop flag for a group
  
  *
  * Data.visibleData = a getter() -- will apply the filters and present the final  immutable list
@@ -40,57 +40,44 @@
  * **/
 
 /**
- * running grouping logic on rawData
- */
-/**
  * Design: Data item order has to be maintained between searches
- *
- */
-
-/**
- * Translation starts from this point onwards
- */
-/**
+ **
  * ## TODO: Make `Data` immutable
  *
  * ## TODO: Check trie -- if we can base it on a trie structure
  *
- * ## TODO: Not feasible: Cache for All ready filtered data
+ * ## TODO: Not feasible: Cache for Already filtered data
  *
- * ##  TODO: Wrapper for the data
+ * ## TODO: Wrapper for the data
  */
 
 function initialSetup(Data = []) {
   Data.grouped = true;
   Data.currentlyGroupedOn = "tagsList"; //ex ..`tag-list` -- will be set programmatically
-
   Data.groupedBy_soFar = ["<field-names>", "tagsList"];
   Data.groupedBy_subHeads = {
     fieldName: ["<..subgroup-names..>"]
   };
-  Data.searchString = ""; // "Text Question - 2"; // will be set programmatically
+  Data.searchString = ""; // will be set programmatically
+  //TODO: DONE: bring it into play
+  Data.hiddenSubgroups = { "sub-group": false };
+  Data.groups = {};
+  let groups = Data.groups;
 
   /**
    * filter to repect while preparing
    * the visible data-set
    */
-  //TODO: bring it into play
-  Data.hiddenSubgroups = { "sub-group": false };
-  // Array seems to be a bad choice ["an array of subgroup names /identifier"];
-
-  Data.groups = {};
-  let groups = Data.groups;
-  //let Data = rawData.table;
 
   /** not using e6 - because require `this` to be Data*/
   Data.groupData = function({ fieldName, type }) {
     let len = this.length;
-    let uniqueGroupNames = null;
+    let uniqueSubGroupNames = null;
     if (type === "Array") {
       /**
        * Here finding unique Group names (values) under the  given fieldName
        */
-      uniqueGroupNames = Array.from(
+      uniqueSubGroupNames = Array.from(
         new Set(
           this.reduce((acc, item) => {
             return [...acc, ...item[fieldName]];
@@ -98,7 +85,7 @@ function initialSetup(Data = []) {
         )
       );
     } else {
-      uniqueGroupNames = Array.from(
+      uniqueSubGroupNames = Array.from(
         new Set(
           this.reduce((acc, item) => {
             return [...acc, item[fieldName]];
@@ -112,20 +99,20 @@ function initialSetup(Data = []) {
      * this will help dictionary search the Data.groups collection for a entire group-name collection
      */
 
-    this.groupedBy_subHeads[fieldName] = uniqueGroupNames; // can be one-to-one or one-to-many
+    this.groupedBy_subHeads[fieldName] = uniqueSubGroupNames; // can be one-to-one or one-to-many
 
     for (let i = 0; i < len; i++) {
-      for (let j = 0; j < uniqueGroupNames.length; j++) {
+      for (let j = 0; j < uniqueSubGroupNames.length; j++) {
         /**
          * Initialization of a `group` entry in groups dictionary
          * - it`s an array
          * - this array has a getter property called searchResult
          * */
 
-        if (!groups[uniqueGroupNames[j]]) {
-          let groupIdentifier = uniqueGroupNames[j];
-          groups[groupIdentifier] = []; // creating a group entry
-          groups[groupIdentifier].visible = true; // keeping it visible by default
+        if (!groups[uniqueSubGroupNames[j]]) {
+          let subGroupIdentifier = uniqueSubGroupNames[j];
+          groups[subGroupIdentifier] = []; // creating a group entry
+          groups[subGroupIdentifier].visible = true; // keeping it visible by default
           /*
             TODO:
             Can be a getter or a value
@@ -134,7 +121,7 @@ function initialSetup(Data = []) {
             Somehow this needs to be throttled
             **/
           Object.defineProperty(
-            groups[groupIdentifier],
+            groups[subGroupIdentifier],
             /* 
                 Directly defining it on the group itself 
                 Data Array after applying filters Namely - Arbitrary filters and Search-String
@@ -146,16 +133,16 @@ function initialSetup(Data = []) {
                 console.log(
                   `### Hidden Subgroups[${Data.hiddenSubgroups}] ###`
                 );
-                if (!Data.hiddenSubgroups[groupIdentifier]) {
+                if (!Data.hiddenSubgroups[subGroupIdentifier]) {
                   dataSet = this.filter(item => {
                     return exp.test(item.question);
                   });
                 }
 
                 return [
-                  { groupIdentifier, start: true },
+                  { subGroupIdentifier, start: true },
                   ...dataSet,
-                  { groupIdentifier, end: true }
+                  { subGroupIdentifier, end: true }
                 ];
               }
             }
@@ -171,12 +158,12 @@ function initialSetup(Data = []) {
          *  */
 
         if (type === "Array") {
-          if (this[i][fieldName].indexOf(uniqueGroupNames[j]) >= 0) {
-            groups[uniqueGroupNames[j]].push(this[i]);
+          if (this[i][fieldName].indexOf(uniqueSubGroupNames[j]) >= 0) {
+            groups[uniqueSubGroupNames[j]].push(this[i]);
           }
         } else {
-          if (this[i][fieldName] === uniqueGroupNames[j]) {
-            groups[uniqueGroupNames[j]].push(this[i]);
+          if (this[i][fieldName] === uniqueSubGroupNames[j]) {
+            groups[uniqueSubGroupNames[j]].push(this[i]);
           }
         }
       }
@@ -240,11 +227,6 @@ function initialSetup(Data = []) {
       subGroupToHide
     ];
   };
-
-  // Data.untoggleSubGroupVisibility = function({ subGroupToUnhide }) {
-  //   this.hiddenSubgroups[subGroupToUnhide] = false;
-  // };
-
   return Data;
 }
 
@@ -271,20 +253,14 @@ function initialSetup(Data = []) {
 
 export function PrepareDataSet(rawData) {
   /**
-   * if require any transformations
-   *
-   * TRANSFORMATIONS come here
-   *
-   */
-  /**
    *  ## Follow Command Query seggregation
    */
   let Data = initialSetup(rawData);
 
   /**
-   * TODO: This call should ideally be made from the client of the Data-set Object
+   * TODO: DONE: This call should ideally be made from the client of the Data-set Object
    */
-  // Data.groupData({ fieldName: "tagsList", type: "Array" });
+
   console.log("Data grouped by so far");
   console.log(Data.groupedBy_soFar);
 
@@ -320,12 +296,9 @@ export function PrepareDataSet(rawData) {
       return Data.groupedBy_subHeads;
     },
     groupData(groupingFields) {
-      //...Data.groupData({ fieldName: "tagsList", type: "Array" });
       groupingFields.forEach(item => {
         Data.groupData({ fieldName: item.fieldName, type: item.type });
       });
-      // Memory consideration
-      //Data.length = 0;
     }
   };
 
