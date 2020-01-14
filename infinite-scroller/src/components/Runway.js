@@ -3,7 +3,7 @@ import _ from "lodash";
 import { ItemTypes } from "../CONTEXT/DraggableTypes";
 import { useDrag } from "react-dnd";
 
-import { DataContext } from "../CONTEXT/available_contexts";
+import { DataContext } from "../CONTEXT/Contexts";
 import { events } from "../CONTEXT/EventEnumeration";
 
 /**
@@ -110,7 +110,7 @@ function Row(props) {
  * TODO: Remove event from the event pool
  *
  *  */
-export default class Runway2 extends Component {
+export default class Runway extends Component {
   state = {
     sentinel_Y: 700,
     rowHeight: 50, //TODO: some logic to calculate the row height
@@ -275,4 +275,4 @@ export default class Runway2 extends Component {
   }
 }
 
-Runway2.contextType = DataContext;
+Runway.contextType = DataContext;

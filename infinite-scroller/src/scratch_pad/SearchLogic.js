@@ -1,56 +1,10 @@
-/**[
-  {
-    tagsList: ["new", "test"],
-    responseId: null,
-    questionId: "a128A0000018AVcQAM",
-    questionExtId: "QB000002",
-    question: "test 123",
-    qType: "Text",
-    lastModifiedDate: "2019-12-30 11:26:22",
-    createdBy: "User User"
-  },
-  
-];*/
-
-/**  Represent data as a flat array, with start and stop flag for a group
- 
- *
- * Data.visibleData = a getter() -- will apply the filters and present the final  immutable list
- *
- * whenever applying the filter -- assign length to zero
- *
- *
- *
- *
- * Frame Logic:::-> can be shifted to Search (Parent Component)
- * - Assume it to be contigous array of elements
- * - Calculate starting and ending indexes of the frame
- * - Translate frame-indexes to group-indexes
- *   - Apply filters
- *
- *       => If the group is toggled-show OR toggled-hide
- *            ==> Then shift / un-shift the index reads by the length of the group
- *       => If Searching
- *            => If grouped data
- *            => filtered Items
- *            => respect Hidden groups
- * - Read the data
- * - while rendering check for filters like
- *
- * **/
-
 /**
- * Design: Data item order has to be maintained between searches
- **
- * ## TODO: Make `Data` immutable
  *
- * ## TODO: Check trie -- if we can base it on a trie structure
  *
- * ## TODO: Not feasible: Cache for Already filtered data
+ *   ### Line Break ###
  *
- * ## TODO: Wrapper for the data
+ *
  */
-
 function initialSetup(Data = []) {
   Data.grouped = true;
   Data.currentlyGroupedOn = "tagsList"; //ex ..`tag-list` -- will be set programmatically

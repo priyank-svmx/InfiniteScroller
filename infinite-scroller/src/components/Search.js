@@ -6,10 +6,11 @@ import _ from "lodash";
 /**
  * ---------------------#####----------------------------*
  */
-import { DataContext, SomeNewData } from "../CONTEXT/available_contexts";
+import { DataContext } from "../CONTEXT/Contexts";
 import { events } from "../CONTEXT/EventEnumeration";
-import Runway from "./Runway2";
-import { PrepareDataSet } from "../StateManagement/SearchLogic";
+import Runway from "./Runway";
+
+import { Construct_DataSet, Proxy } from "../StateManagement/DataSet";
 /**
  * TODO: DONE: --
  * Create a wrapper around Data object
@@ -17,7 +18,7 @@ import { PrepareDataSet } from "../StateManagement/SearchLogic";
  * - to pass search-string or any kind of filter logic trigger
  */
 
-let Proxy = null;
+//let Proxy = null;
 
 /**
  * 
@@ -88,10 +89,9 @@ export default class Search extends Component {
     activeTabKey: 0, // tagList, field-name
     searchString: "",
     eventFired: events.none, // hide,unhide,tab-change,search
-    dataSet:
-      ((Proxy = PrepareDataSet(this.props.data.table)), //
-      Proxy.groupData(this.props.groupOnFields),
-      Proxy.onSearch(""))
+    dataSet: Construct_DataSet(this.props.data.table)
+      .groupData(this.props.groupOnFields)
+      .onSearch("")
   };
 
   fireEvent({ eventName, payload }) {
@@ -174,7 +174,6 @@ export default class Search extends Component {
                 >
                   Click Me
                 </button>
-                {/*<Functional_Component />**/}
               </div>
               <div className="tabs">
                 {this.props.tabs.map((tabName, indx) => {
