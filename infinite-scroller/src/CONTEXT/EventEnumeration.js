@@ -1,8 +1,8 @@
 export const events = {
-  hide: "_HIDE_GROUP_",
-  unhide: "_UNHIDE_GROUP_",
-  group: "_CHANGE_GROUP_",
+  hide: "_HIDE.GROUP_",
+  unhide: "_UNHIDE.GROUP_",
+  group: "_CHANGE.GROUP_",
   ungrouped: "_UNGROUP_",
-  search: "_ON_SEARCH_",
+  search: "_ON.SEARCH_",
   none: "_NONE_"
 };

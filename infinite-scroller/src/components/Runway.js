@@ -7,10 +7,16 @@ import { DataContext } from "../CONTEXT/Contexts";
 import { events } from "../CONTEXT/EventEnumeration";
 
 /**
- * ____BUG____
+ * BUG==><=FIXED>=
  * Saving scroll-position for various tabs -
  * - if scrolling in one tab should not effect scroll position of the other tabs
  * - Scroll should be smooth when moving down on the list
+ *
+ * FIX:DONE:
+ * - On Tab Change
+ *   - Save the current scroll-top position against the Current active tab
+ *   - Read the scroll-top position (stposition), if there is any against the Tab clicked
+ *   - Set the Scroll-top to 0 or to `stposition`
  *
  */
 
@@ -117,6 +123,9 @@ export default class Runway extends Component {
     scrollLocation: {
       scrollTop: 0,
       clientHeight: 600
+    },
+    map_prop_to_state: {
+      map_this_prop_as_key_to_state: "scrollTopValue"
     }
     /**
      * Improvement: DONE:
@@ -137,6 +146,7 @@ export default class Runway extends Component {
 
   constructor(props) {
     super(props);
+    this.runwayDivRef = React.createRef();
     //this.throttledOnScroll = _.throttle(this.onScroll.bind(this), 200);
   }
 
@@ -239,11 +249,16 @@ export default class Runway extends Component {
      * informing the component regarding the
      * present scroll-location
      */
+
     this.setState({
       scrollLocation: {
         scrollTop,
         clientHeight,
         scrollHeight
+      },
+      map_prop_to_state: {
+        ...this.state.map_prop_to_state,
+        [this.props.map_this_prop_as_key_to_state]: scrollTop
       }
     });
     if (scrollTop + clientHeight >= scrollHeight) {
@@ -251,15 +266,24 @@ export default class Runway extends Component {
     }
   }
 
+  componentDidUpdate() {
+    let propKey = this.props.map_this_prop_as_key_to_state;
+    let previousScrollTopValue = this.state.map_prop_to_state[propKey];
+    if (previousScrollTopValue) {
+      this.runwayDivRef.current.scrollTop = previousScrollTopValue;
+    } else {
+      this.runwayDivRef.current.scrollTop = 0;
+    }
+  }
+
   render() {
-    console.log("How state tree looks like after every render");
-    console.log(this.state);
     return (
       <React.Fragment>
         <div className="runway-viewport">
           <div
             className="runway-row-container"
             onScroll={evt => this.onScroll(evt)}
+            ref={this.runwayDivRef}
           >
             <div
               className="runway-sentinel"

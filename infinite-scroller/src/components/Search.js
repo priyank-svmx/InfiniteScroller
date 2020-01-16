@@ -84,9 +84,11 @@ export default class Search extends Component {
    * SearchPanel => Compose{ <Runway2/> wrapped by HOC    }
    *
    *
+   *
+   *
    */
   state = {
-    activeTabKey: 0, // tagList, field-name
+    activeTabKey: 0, // tagList, field-name,
     searchString: "",
     eventFired: events.none, // hide,unhide,tab-change,search
     dataSet: Construct_DataSet(this.props.data.table)
@@ -196,6 +198,7 @@ export default class Search extends Component {
                 triggerEvent={({ eventName, payload }) => {
                   this.fireEvent({ eventName, payload });
                 }}
+                map_this_prop_as_key_to_state={this.state.activeTabKey}
               />
             </DataContext.Provider>
           </div>
