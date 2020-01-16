@@ -2,7 +2,8 @@ import React from "react";
 import rawData from "./CONTEXT/DATA";
 import "./App.css";
 
-import Search from "./components/Search";
+//import Search from "./components/Search";
+import Search from "./InfiniteScrollerComponent";
 
 function App() {
   return (
